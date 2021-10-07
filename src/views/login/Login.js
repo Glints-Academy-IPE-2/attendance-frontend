@@ -19,7 +19,7 @@ import {
   CFormGroup,
   CFormText,
   CAlert,
-  CSpinner,
+  CSpinner
 } from "@coreui/react";
 
 import AuthServices from "../../services/auth.service";
@@ -39,16 +39,18 @@ const Login = () => {
   const history = useHistory();
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required("Email is required").email("Email is invalid"),
-    password: Yup.string().required("Password is required"),
+    email: Yup.string()
+      .required("Email is required")
+      .email("Email is invalid"),
+    password: Yup.string().required("Password is required")
   });
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema)
   });
 
   const loginHandler = (data, element) => {
@@ -59,7 +61,7 @@ const Login = () => {
         history.push("/");
         window.location.reload();
       })
-      .catch((err) => {
+      .catch(err => {
         // empty password field
         element.target[1].value = "";
         setIsErrorResponse(true);
@@ -75,7 +77,7 @@ const Login = () => {
         .then(() => {
           loginHandler(data, element);
         })
-        .catch((err) => {
+        .catch(err => {
           setIsErrorResponse(true);
           setErrorResponseMessage(err.response.data.errorMessage);
           setIsLoading(false);
@@ -165,7 +167,7 @@ const Login = () => {
                             backgroundColor: "#6C63FF",
                             border: "#6C63FF",
                             color: "white",
-                            width: "100%",
+                            width: "100%"
                           }}
                           type="submit"
                           disabled={isLoading}

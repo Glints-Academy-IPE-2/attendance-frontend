@@ -1,12 +1,12 @@
 const axios = require("axios");
 
-const API_URL = "http://localhost:8000/pub/";
+const API_URL = "https://ipe-attendance.herokuapp.com/pub/";
 
 const register = (username, email, password) => {
   return axios.post(API_URL + "register", {
     username,
     email,
-    password,
+    password
   });
 };
 
@@ -14,9 +14,9 @@ const login = (email, password) => {
   return axios
     .post(API_URL + "login", {
       email,
-      password,
+      password
     })
-    .then((response) => {
+    .then(response => {
       if (response.data.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data.data));
       }
@@ -25,19 +25,19 @@ const login = (email, password) => {
     });
 };
 
-const forgotPassword = (email) => {
+const forgotPassword = email => {
   return axios.post(API_URL + "requestResetPassword", {
-    email,
+    email
   });
 };
 
 const resetPassword = (email, token, password) => {
   return axios.post(API_URL + `resetPassword/${email}/${token}`, {
-    password,
+    password
   });
 };
 
-const verifyUser = (token) => {
+const verifyUser = token => {
   return axios.get(API_URL + `verify-user/${token}`);
 };
 
@@ -48,7 +48,7 @@ const logout = () => {
 const getCurrentUser = () => {
   return (
     JSON.parse(localStorage.getItem("user")) || {
-      user: { isAdmin: false, email: false },
+      user: { isAdmin: false, email: false }
     }
   );
 };
@@ -60,7 +60,7 @@ const AuthServices = {
   resetPassword,
   verifyUser,
   logout,
-  getCurrentUser,
+  getCurrentUser
 };
 
 export default AuthServices;

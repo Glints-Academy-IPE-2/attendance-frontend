@@ -15,8 +15,8 @@ let routes = [
   {
     path: "/changepassword",
     name: "Change Password",
-    component: ChangePassword,
-  },
+    component: ChangePassword
+  }
 ];
 
 if (!isAdmin) {
@@ -32,7 +32,7 @@ if (!isAdmin) {
     ...routes,
     { path: "/", exact: true, name: "Home" },
     { path: "/dashboard", name: "Dashboard", component: Dashboard },
-    { path: "/attendance", name: "Attendance", component: Attendance },
+    { path: "/attendance", name: "Attendance", component: Attendance }
   ];
 } else {
   // Admin Routes
@@ -48,23 +48,21 @@ if (!isAdmin) {
 
   routes = [
     ...routes,
-    {
-      path: "/dashboardadmin",
-      name: "Dashboard Admin",
-      component: DashboardAdmin,
-    },
+    { path: "/", exact: true, name: "Dashboard Admin" },
+    { path: "/dashboard", name: "Dashboard", component: DashboardAdmin },
+
     {
       path: "/approve",
       exact: true,
       name: "Approve Users",
-      component: ApproveUsers,
+      component: ApproveUsers
     },
     {
       path: "/usersattendance",
       exact: true,
       name: "Users Attendance",
-      component: UsersAttendance,
-    },
+      component: UsersAttendance
+    }
   ];
 }
 

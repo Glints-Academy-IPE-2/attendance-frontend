@@ -11,7 +11,7 @@ import {
   CModalBody,
   CModalFooter,
   CAlert,
-  CSpinner,
+  CSpinner
 } from "@coreui/react";
 
 import UserServices from "../../../../services/user.services";
@@ -30,10 +30,13 @@ const ApproveUsers = () => {
   const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const getAlluser = () => {
-    UserServices.getAllUsers().then((res) => {
+    setIsLoading(false);
+    UserServices.getAllUsers().then(res => {
       const users = res.data.data.users.rows;
-      const filteredUsers = users.filter((user) => user.isApproved === false);
+      const filteredUsers = users.filter(user => user.isApproved === false);
       setNotApprovedUsers(filteredUsers);
     });
   };
@@ -58,13 +61,13 @@ const ApproveUsers = () => {
       console.log("hapus");
     } else {
       UserServices.approveUser(token)
-        .then((res) => {
+        .then(res => {
           console.log(res);
           getAlluser();
           setAlertType("success");
           setAlertMessage("Approve successfull");
         })
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
     }
   };
 
@@ -76,7 +79,7 @@ const ApproveUsers = () => {
     <>
       <CRow>
         <CCol>
-          {!notApprovedUsers && <CSpinner color="info" />}
+          {isLoading && <CSpinner color="info" />}
           <CCard>
             <CCardHeader
               style={{
@@ -84,7 +87,7 @@ const ApproveUsers = () => {
                 color: "white",
                 fontWeight: "600",
                 borderRadius: "10px 10px 0 0",
-                marginTop: "-10px",
+                marginTop: "-10px"
               }}
             >
               Approve Users
@@ -102,7 +105,7 @@ const ApproveUsers = () => {
                 itemsPerPage={5}
                 pagination
                 scopedSlots={{
-                  action: (item) => (
+                  action: item => (
                     <td>
                       <CButton
                         shape="pill"
@@ -125,7 +128,7 @@ const ApproveUsers = () => {
                         Reject
                       </CButton>
                     </td>
-                  ),
+                  )
                 }}
               />
             </CCardBody>

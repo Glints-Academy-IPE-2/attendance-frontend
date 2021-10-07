@@ -1,28 +1,28 @@
 import authHeader from "./auth.header";
 const axios = require("axios");
 
-const API_URL = "http://localhost:8000/api/admin/";
+const API_URL = "https://ipe-attendance.herokuapp.com/api/admin/";
 
 const getAllUsers = () => {
   return axios.get(API_URL + "get-user", { headers: authHeader() });
 };
 
-const approveUser = (verifiedToken) => {
+const approveUser = verifiedToken => {
   return axios.get(API_URL + "approve-user/" + verifiedToken, {
-    headers: authHeader(),
+    headers: authHeader()
   });
 };
 
-const deleteUser = (id) => {
+const deleteUser = id => {
   return axios.delete(API_URL + "delete-user/" + id, {
-    headers: authHeader(),
+    headers: authHeader()
   });
 };
 
 const UserServices = {
   getAllUsers,
   approveUser,
-  deleteUser,
+  deleteUser
 };
 
 export default UserServices;
