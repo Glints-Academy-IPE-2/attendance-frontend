@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
 import {
   CButton,
@@ -24,7 +24,14 @@ import {
 
 import AuthServices from "../../services/auth.service";
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 const Login = () => {
+  let query = useQuery();
+  const token = query.get("token");
+
   const [isErrorResponse, setIsErrorResponse] = useState(false);
   const [errorResponseMessage, setErrorResponseMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -44,8 +51,7 @@ const Login = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = (data, e) => {
-    setIsLoading(true);
+  const loginHandler = (data, element) => {
     const { email, password } = data;
     AuthServices.login(email, password)
       .then(() => {
@@ -55,11 +61,28 @@ const Login = () => {
       })
       .catch((err) => {
         // empty password field
-        e.target[1].value = "";
+        element.target[1].value = "";
         setIsErrorResponse(true);
         setErrorResponseMessage(err.response.data.errorMessage);
         setIsLoading(false);
       });
+  };
+
+  const onSubmit = (data, element) => {
+    setIsLoading(true);
+    if (token) {
+      AuthServices.verifyUser(token)
+        .then(() => {
+          loginHandler(data, element);
+        })
+        .catch((err) => {
+          setIsErrorResponse(true);
+          setErrorResponseMessage(err.response.data.errorMessage);
+          setIsLoading(false);
+        });
+    } else {
+      loginHandler(data, element);
+    }
   };
 
   return (

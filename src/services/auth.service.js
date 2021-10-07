@@ -37,6 +37,10 @@ const resetPassword = (email, token, password) => {
   });
 };
 
+const verifyUser = (token) => {
+  return axios.get(API_URL + `verify-user/${token}`);
+};
+
 const logout = () => {
   localStorage.removeItem("user");
 };
@@ -50,6 +54,7 @@ const AuthServices = {
   login,
   forgotPassword,
   resetPassword,
+  verifyUser,
   logout,
   getCurrentUser,
 };
