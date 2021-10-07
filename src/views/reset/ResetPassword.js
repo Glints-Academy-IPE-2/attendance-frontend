@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   CButton,
   CCard,
@@ -15,7 +14,7 @@ import {
   CAlert,
 } from "@coreui/react";
 
-import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -60,13 +59,14 @@ const Reset = () => {
     const email = query.get("email");
     const token = query.get("token");
 
-    AuthServices.register(email, token)
+    console.log(email, token, data.password);
+
+    AuthServices.resetPassword(email, token, data.password)
       .then((res) => {
-        const responseMessage = "Reset password successfull";
         reset();
         setIsResponding(true);
         setResponseType("success");
-        setResponseMessage(responseMessage);
+        setResponseMessage("Reset password successfull");
         setIsLoading(false);
       })
       .catch((err) => {
@@ -78,112 +78,110 @@ const Reset = () => {
   };
 
   return (
-    <Router>
-      <div
-        className="c-app c-default-layout flex-row align-items-center"
-        style={{ backgroundColor: "white" }}
-      >
-        <CContainer>
-          <CRow className="justify-content-center">
-            <CCol md="6">
-              <CCardGroup>
-                <CCard className="p-4">
-                  <CCardBody>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                      <h1
-                        className="text-center mb-4"
-                        style={{ fontWeight: "bold" }}
+    <div
+      className="c-app c-default-layout flex-row align-items-center"
+      style={{ backgroundColor: "white" }}
+    >
+      <CContainer>
+        <CRow className="justify-content-center">
+          <CCol md="6">
+            <CCardGroup>
+              <CCard className="p-4">
+                <CCardBody>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <h1
+                      className="text-center mb-4"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      Reset Password
+                    </h1>
+                    {isResponding && (
+                      <CAlert
+                        color={responseType}
+                        onClick={() => {
+                          setIsResponding(false);
+                        }}
+                        closeButton
                       >
-                        Reset Password
-                      </h1>
-                      {isResponding && (
-                        <CAlert
-                          color={responseType}
-                          onClick={() => {
-                            setIsResponding(false);
+                        {responseMessage}
+                      </CAlert>
+                    )}
+                    <CFormGroup className="my-2">
+                      <CLabel htmlFor="password" style={{ opacity: "50%" }}>
+                        New Password
+                      </CLabel>
+                      <input
+                        name="password"
+                        type="password"
+                        {...register("password")}
+                        className={`form-control ${
+                          errors.password ? "is-invalid" : ""
+                        }`}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.password ? errors.password.message : ""}
+                      </div>
+                    </CFormGroup>
+                    <CFormGroup className="my-2">
+                      <CLabel
+                        htmlFor="confirm-password"
+                        style={{ opacity: "50%" }}
+                      >
+                        Confirm New Password
+                      </CLabel>
+                      <input
+                        name="confirmPassword"
+                        type="password"
+                        {...register("confirmPassword")}
+                        className={`form-control ${
+                          errors.confirmPassword ? "is-invalid" : ""
+                        }`}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.confirmPassword
+                          ? errors.confirmPassword.message
+                          : ""}
+                      </div>
+                    </CFormGroup>
+                    <CRow>
+                      <CCol>
+                        <CButton
+                          className="py-2 mt-2"
+                          shape="pill"
+                          style={{
+                            backgroundColor: "#6C63FF",
+                            border: "#6C63FF",
+                            color: "white",
+                            width: "100%",
                           }}
-                          closeButton
+                          type="submit"
+                          disabled={isLoading}
                         >
-                          {responseMessage}
-                        </CAlert>
-                      )}
-                      <CFormGroup className="my-2">
-                        <CLabel htmlFor="password" style={{ opacity: "50%" }}>
-                          New Password
-                        </CLabel>
-                        <input
-                          name="password"
-                          type="password"
-                          {...register("password")}
-                          className={`form-control ${
-                            errors.password ? "is-invalid" : ""
-                          }`}
-                        />
-                        <div className="invalid-feedback">
-                          {errors.password ? errors.password.message : ""}
-                        </div>
-                      </CFormGroup>
-                      <CFormGroup className="my-2">
-                        <CLabel
-                          htmlFor="confirm-password"
-                          style={{ opacity: "50%" }}
-                        >
-                          Confirm New Password
-                        </CLabel>
-                        <input
-                          name="confirmPassword"
-                          type="password"
-                          {...register("confirmPassword")}
-                          className={`form-control ${
-                            errors.confirmPassword ? "is-invalid" : ""
-                          }`}
-                        />
-                        <div className="invalid-feedback">
-                          {errors.confirmPassword
-                            ? errors.confirmPassword.message
-                            : ""}
-                        </div>
-                      </CFormGroup>
-                      <CRow>
-                        <CCol>
-                          <CButton
-                            className="py-2 mt-2"
-                            shape="pill"
-                            style={{
-                              backgroundColor: "#6C63FF",
-                              border: "#6C63FF",
-                              color: "white",
-                              width: "100%",
-                            }}
-                            type="submit"
-                            disabled={isLoading}
-                          >
-                            {isLoading && (
-                              <CSpinner
-                                color="white"
-                                size="sm"
-                                className="mr-1"
-                              />
-                            )}
-                            <span>Reset</span>
-                          </CButton>
-                          <CFormText className="mb-2 mt-2 text-center">
-                            Back to&nbsp;
-                            <Link to="/login" style={{ color: "#6C63FF" }}>
-                              Login
-                            </Link>
-                          </CFormText>
-                        </CCol>
-                      </CRow>
-                    </form>
-                  </CCardBody>
-                </CCard>
-              </CCardGroup>
-            </CCol>
-          </CRow>
-        </CContainer>
-      </div>
-    </Router>
+                          {isLoading && (
+                            <CSpinner
+                              color="white"
+                              size="sm"
+                              className="mr-1"
+                            />
+                          )}
+                          <span>Reset</span>
+                        </CButton>
+                        <CFormText className="mb-2 mt-2 text-center">
+                          Back to&nbsp;
+                          <Link to="/login" style={{ color: "#6C63FF" }}>
+                            Login
+                          </Link>
+                        </CFormText>
+                      </CCol>
+                    </CRow>
+                  </form>
+                </CCardBody>
+              </CCard>
+            </CCardGroup>
+          </CCol>
+        </CRow>
+      </CContainer>
+    </div>
   );
 };
 

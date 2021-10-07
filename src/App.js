@@ -45,7 +45,7 @@ class App extends Component {
             />
             <Route
               exact
-              path="/reset"
+              path="/resetPassword"
               name="Reset Password Page"
               render={(props) => <Reset {...props} />}
             />
