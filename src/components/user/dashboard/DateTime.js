@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 const DateTime = () => {
-  const [clockState, setClockState] = useState("00:00 am");
-  const [dateState, setDateState] = useState("Thursday, 1 January 1970");
+  const [clockState, setClockState] = useState("");
+  const [dateState, setDateState] = useState("");
 
   useEffect(() => {
     const days = [
@@ -12,7 +12,7 @@ const DateTime = () => {
       "Wednesday",
       "Thursday",
       "Friday",
-      "Saturday"
+      "Saturday",
     ];
     const months = [
       "January",
@@ -26,7 +26,7 @@ const DateTime = () => {
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ];
 
     const interval = setInterval(() => {
