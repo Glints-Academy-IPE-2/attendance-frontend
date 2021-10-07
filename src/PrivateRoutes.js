@@ -4,7 +4,6 @@ import AuthServices from "./services/auth.service";
 
 export default function PrivateRoute({ component: Component, ...rest }) {
   const currentUser = AuthServices.getCurrentUser().user.email;
-  console.log(currentUser);
 
   return (
     <Route

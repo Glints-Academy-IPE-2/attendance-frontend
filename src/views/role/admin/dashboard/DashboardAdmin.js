@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CCard,
   CCardBody,
@@ -9,34 +9,83 @@ import {
   CButton,
   CModal,
   CModalBody,
-  CModalFooter
+  CModalFooter,
+  CAlert,
+  CImg,
 } from "@coreui/react";
 
 import { ApproveUsersData } from "../../../data/Attendance";
+import UserServices from "../../../../services/user.services";
 
-const userFields = ["name", "action"];
+const userFields = ["username", "action"];
 const absentFields = ["name", "absent", "action"];
 
 const DashboardAdmin = () => {
+  const [users, setUsers] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  const [userDetail, setUserDetail] = useState({});
+
+  // modal detail
+  const [modalDetail, setModalDetail] = useState(false);
+
+  // modal reset and delete
   const [modal, setModal] = useState(false);
-
-  const [modalColor, setModalColor] = useState("");
+  const [modalType, setModalType] = useState("");
   const [modalMessage, setModalMessage] = useState("");
-  const [modalTextColor, setModalTextColor] = useState("");
+  const [modalButtonText, setModalBmodalButtonText] = useState("");
 
-  const deleteHandler = () => {
-    setModalMessage("Delete this user?");
-    setModalColor("danger");
-    setModalTextColor("text-danger text-center");
-    setModal(!modal);
+  const [alertType, setAlertType] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
+
+  const modalDetailHandler = (data) => {
+    setModalDetail(!modalDetail);
+    setUserDetail(data);
   };
 
-  const resetLocationHandler = () => {
-    setModalMessage("Reset user location?");
-    setModalColor("warning");
-    setModalTextColor("text-warning text-center");
+  const userButtonHandler = (type, item) => {
     setModal(!modal);
+    setUserId(item.id);
+    if (type === "danger") {
+      setModalMessage("Delete this user?");
+      setModalType("danger");
+      setModalBmodalButtonText("Reset");
+    } else {
+      setModalMessage("Reset user location?");
+      setModalType("warning");
+      setModalBmodalButtonText("Reset");
+    }
   };
+
+  const deleteResetHandler = () => {
+    setModal(!modal);
+    if (modalType === "danger") {
+      UserServices.deleteUser(userId)
+        .then((res) => {
+          setAlertType("success");
+          setAlertMessage("User deleted successfully");
+          getAlluser();
+        })
+        .catch((err) => {
+          setAlertType("success");
+          setAlertMessage("User failed to delete");
+        });
+    }
+  };
+
+  const getAlluser = () => {
+    UserServices.getAllUsers().then((res) => {
+      const users = res.data.data.users.rows;
+      const filteredUsers = users.filter(
+        (user) => user.isApproved === true && user.isVerified === true
+      );
+      setUsers(filteredUsers);
+    });
+  };
+
+  useEffect(() => {
+    getAlluser();
+  }, []);
 
   return (
     <>
@@ -49,26 +98,32 @@ const DashboardAdmin = () => {
                 color: "white",
                 fontWeight: "600",
                 borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
+                marginTop: "-10px",
               }}
             >
               Users
             </CCardHeader>
             <CCardBody>
+              {alertType && (
+                <CAlert color={alertType} closeButton>
+                  {alertMessage}
+                </CAlert>
+              )}
               <CDataTable
-                items={ApproveUsersData}
+                items={users}
                 fields={userFields}
                 bordered
                 itemsPerPage={5}
                 pagination
                 scopedSlots={{
-                  action: item => (
+                  action: (item) => (
                     <td>
                       <CButton
                         shape="pill"
                         color="info"
                         size="sm"
                         className="mx-1 px-3"
+                        onClick={() => modalDetailHandler(item)}
                       >
                         Detail
                       </CButton>
@@ -77,7 +132,7 @@ const DashboardAdmin = () => {
                         color="warning"
                         size="sm"
                         className="mx-1 px-3"
-                        onClick={resetLocationHandler}
+                        onClick={() => userButtonHandler("warning", item)}
                       >
                         Reset Location
                       </CButton>
@@ -86,12 +141,12 @@ const DashboardAdmin = () => {
                         color="danger"
                         size="sm"
                         className="mx-1 px-3"
-                        onClick={deleteHandler}
+                        onClick={() => userButtonHandler("danger", item)}
                       >
                         Delete
                       </CButton>
                     </td>
-                  )
+                  ),
                 }}
               />
             </CCardBody>
@@ -105,7 +160,7 @@ const DashboardAdmin = () => {
                 color: "white",
                 fontWeight: "600",
                 borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
+                marginTop: "-10px",
               }}
             >
               Absent more than 2 days this month
@@ -118,7 +173,7 @@ const DashboardAdmin = () => {
                 itemsPerPage={5}
                 pagination
                 scopedSlots={{
-                  action: item => (
+                  action: (item) => (
                     <td>
                       <CButton
                         shape="pill"
@@ -129,7 +184,7 @@ const DashboardAdmin = () => {
                         Detail
                       </CButton>
                     </td>
-                  )
+                  ),
                 }}
               />
             </CCardBody>
@@ -137,22 +192,48 @@ const DashboardAdmin = () => {
         </CCol>
       </CRow>
 
-      {/* Modal */}
+      {/* Modal Reset and Delete */}
       <CModal
         size="sm"
         show={modal}
         onClose={() => setModal(!modal)}
-        color={modalColor}
+        color={modalType}
       >
-        <CModalBody className={modalTextColor}>
+        <CModalBody className={`text-${modalType} text-center`}>
           <h4>{modalMessage}</h4>
         </CModalBody>
         <CModalFooter>
-          <CButton color={modalColor} onClick={() => setModal(!modal)}>
-            Okay
+          <CButton color={modalType} onClick={() => deleteResetHandler()}>
+            {modalButtonText}
           </CButton>{" "}
           <CButton color="secondary" onClick={() => setModal(!modal)}>
             Cancel
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal detail */}
+      <CModal
+        size="sm"
+        show={modalDetail}
+        onClose={() => setModalDetail(!modalDetail)}
+      >
+        <CModalBody className="text-center">
+          <CImg
+            style={{ width: "200px" }}
+            className="c-avatar-img"
+            src={"avatars/" + userDetail.avatar}
+            alt="user-avatar"
+          />
+          <h4>{userDetail.username}</h4>
+          <p>{userDetail.email}</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton
+            color="secondary"
+            onClick={() => setModalDetail(!modalDetail)}
+          >
+            Close
           </CButton>
         </CModalFooter>
       </CModal>
