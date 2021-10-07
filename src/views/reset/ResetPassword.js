@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   CButton,
@@ -7,75 +7,183 @@ import {
   CCardGroup,
   CCol,
   CContainer,
-  CForm,
-  CInput,
   CRow,
   CLabel,
   CFormGroup,
   CFormText,
+  CSpinner,
+  CAlert,
 } from "@coreui/react";
 
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
+
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
+import AuthServices from "../../services/auth.service";
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 const Reset = () => {
+  let query = useQuery();
+
+  const [isResponding, setIsResponding] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [responseType, setResponseType] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validationSchema = Yup.object().shape({
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(40, "Password must not exceed 40 characters"),
+    confirmPassword: Yup.string()
+      .required("Confirm Password is required")
+      .oneOf([Yup.ref("password"), null], "Confirm Password does not match"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit = (data) => {
+    setIsLoading(true);
+
+    const email = query.get("email");
+    const token = query.get("token");
+
+    AuthServices.register(email, token)
+      .then((res) => {
+        const responseMessage = "Reset password successfull";
+        reset();
+        setIsResponding(true);
+        setResponseType("success");
+        setResponseMessage(responseMessage);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setIsResponding(true);
+        setResponseType("danger");
+        setResponseMessage(err.response.data.errorMessage);
+        setIsLoading(false);
+      });
+  };
+
   return (
-    <div
-      className="c-app c-default-layout flex-row align-items-center"
-      style={{ backgroundColor: "white" }}
-    >
-      <CContainer>
-        <CRow className="justify-content-center">
-          <CCol md="6">
-            <CCardGroup>
-              <CCard className="p-4">
-                <CCardBody>
-                  <CForm>
-                    <h1 className="text-center" style={{ fontWeight: "bold" }}>
-                      Reset Password
-                    </h1>
-                    <CFormGroup className="my-4">
-                      <CLabel htmlFor="newPassword" style={{ opacity: "50%" }}>
-                        New Password
-                      </CLabel>
-                      <CInput type="password" id="newPassword" />
-                    </CFormGroup>
-                    <CFormGroup className="my-4">
-                      <CLabel
-                        htmlFor="cofirmNewPassword"
-                        style={{ opacity: "50%" }}
+    <Router>
+      <div
+        className="c-app c-default-layout flex-row align-items-center"
+        style={{ backgroundColor: "white" }}
+      >
+        <CContainer>
+          <CRow className="justify-content-center">
+            <CCol md="6">
+              <CCardGroup>
+                <CCard className="p-4">
+                  <CCardBody>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                      <h1
+                        className="text-center mb-4"
+                        style={{ fontWeight: "bold" }}
                       >
-                        Confirm New Password
-                      </CLabel>
-                      <CInput type="password" id="cofirmNewPassword" />
-                    </CFormGroup>
-                    <CRow>
-                      <CCol>
-                        <CButton
-                          className="py-2"
-                          shape="pill"
-                          style={{
-                            backgroundColor: "#6C63FF",
-                            border: "#6C63FF",
-                            color: "white",
-                            width: "100%",
+                        Reset Password
+                      </h1>
+                      {isResponding && (
+                        <CAlert
+                          color={responseType}
+                          onClick={() => {
+                            setIsResponding(false);
                           }}
+                          closeButton
                         >
-                          Reset
-                        </CButton>
-                        <CFormText className="mb-2 mt-2 text-center">
-                          Back to&nbsp;
-                          <Link to="/login" style={{ color: "#6C63FF" }}>
-                            Login
-                          </Link>
-                        </CFormText>
-                      </CCol>
-                    </CRow>
-                  </CForm>
-                </CCardBody>
-              </CCard>
-            </CCardGroup>
-          </CCol>
-        </CRow>
-      </CContainer>
-    </div>
+                          {responseMessage}
+                        </CAlert>
+                      )}
+                      <CFormGroup className="my-2">
+                        <CLabel htmlFor="password" style={{ opacity: "50%" }}>
+                          New Password
+                        </CLabel>
+                        <input
+                          name="password"
+                          type="password"
+                          {...register("password")}
+                          className={`form-control ${
+                            errors.password ? "is-invalid" : ""
+                          }`}
+                        />
+                        <div className="invalid-feedback">
+                          {errors.password ? errors.password.message : ""}
+                        </div>
+                      </CFormGroup>
+                      <CFormGroup className="my-2">
+                        <CLabel
+                          htmlFor="confirm-password"
+                          style={{ opacity: "50%" }}
+                        >
+                          Confirm New Password
+                        </CLabel>
+                        <input
+                          name="confirmPassword"
+                          type="password"
+                          {...register("confirmPassword")}
+                          className={`form-control ${
+                            errors.confirmPassword ? "is-invalid" : ""
+                          }`}
+                        />
+                        <div className="invalid-feedback">
+                          {errors.confirmPassword
+                            ? errors.confirmPassword.message
+                            : ""}
+                        </div>
+                      </CFormGroup>
+                      <CRow>
+                        <CCol>
+                          <CButton
+                            className="py-2 mt-2"
+                            shape="pill"
+                            style={{
+                              backgroundColor: "#6C63FF",
+                              border: "#6C63FF",
+                              color: "white",
+                              width: "100%",
+                            }}
+                            type="submit"
+                            disabled={isLoading}
+                          >
+                            {isLoading && (
+                              <CSpinner
+                                color="white"
+                                size="sm"
+                                className="mr-1"
+                              />
+                            )}
+                            <span>Reset</span>
+                          </CButton>
+                          <CFormText className="mb-2 mt-2 text-center">
+                            Back to&nbsp;
+                            <Link to="/login" style={{ color: "#6C63FF" }}>
+                              Login
+                            </Link>
+                          </CFormText>
+                        </CCol>
+                      </CRow>
+                    </form>
+                  </CCardBody>
+                </CCard>
+              </CCardGroup>
+            </CCol>
+          </CRow>
+        </CContainer>
+      </div>
+    </Router>
   );
 };
 

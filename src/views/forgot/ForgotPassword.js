@@ -73,7 +73,10 @@ const Forgot = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <form onSubmit={handleSubmit(onSubmit)}>
-                    <h1 className="text-center" style={{ fontWeight: "bold" }}>
+                    <h1
+                      className="text-center mb-4"
+                      style={{ fontWeight: "bold" }}
+                    >
                       Forgot Password
                     </h1>
                     {responseMessage && (

@@ -202,7 +202,7 @@ const Register = () => {
                               className="mr-1"
                             />
                           )}
-                          Register
+                          <span>Register</span>
                         </CButton>
                         <CFormText className="mb-2 mt-2">
                           Already have an account?&nbsp;

@@ -31,6 +31,14 @@ const forgotPassword = (email) => {
   });
 };
 
+const resetPassword = (email, token) => {
+  return axios.post(API_URL + "register", {
+    username,
+    email,
+    password,
+  });
+};
+
 const logout = () => {
   localStorage.removeItem("user");
 };
