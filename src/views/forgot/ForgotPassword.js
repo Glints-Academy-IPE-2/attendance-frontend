@@ -54,7 +54,6 @@ const Forgot = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
         setIsLoading(false);
         setResponseType("danger");
         setResponseMessage("An error has occurred");

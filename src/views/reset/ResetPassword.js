@@ -59,8 +59,6 @@ const Reset = () => {
     const email = query.get("email");
     const token = query.get("token");
 
-    console.log(email, token, data.password);
-
     AuthServices.resetPassword(email, token, data.password)
       .then((res) => {
         reset();

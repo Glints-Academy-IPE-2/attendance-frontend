@@ -46,7 +46,11 @@ const logout = () => {
 };
 
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  return (
+    JSON.parse(localStorage.getItem("user")) || {
+      user: { isAdmin: false, email: false },
+    }
+  );
 };
 
 const AuthServices = {

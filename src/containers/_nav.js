@@ -13,18 +13,18 @@ if (!isAdmin) {
       _tag: "CSidebarNavItem",
       name: "Dashboard",
       to: "/dashboard",
-      icon: <CIcon name="cil-speedometer" customClasses="c-sidebar-nav-icon" />
+      icon: <CIcon name="cil-speedometer" customClasses="c-sidebar-nav-icon" />,
     },
     {
       _tag: "CSidebarNavItem",
       name: "Attendance",
       to: "/attendance",
-      icon: <CIcon name="cil-calendar" customClasses="c-sidebar-nav-icon" />
+      icon: <CIcon name="cil-calendar" customClasses="c-sidebar-nav-icon" />,
     },
     {
       _tag: "CSidebarNavDivider",
-      className: "m-2"
-    }
+      className: "m-2",
+    },
   ];
 } else {
   _nav = [
@@ -32,28 +32,28 @@ if (!isAdmin) {
       _tag: "CSidebarNavItem",
       name: "Dashboard Admin",
       to: "/dashboardadmin",
-      icon: <CIcon name="cil-speedometer" customClasses="c-sidebar-nav-icon" />
+      icon: <CIcon name="cil-speedometer" customClasses="c-sidebar-nav-icon" />,
     },
     {
       _tag: "CSidebarNavTitle",
-      _children: ["Users"]
+      _children: ["Users"],
     },
     {
       _tag: "CSidebarNavItem",
       name: "Users Attendance",
       to: "/usersattendance",
-      icon: <CIcon name="cil-calendar" customClasses="c-sidebar-nav-icon" />
+      icon: <CIcon name="cil-calendar" customClasses="c-sidebar-nav-icon" />,
     },
     {
       _tag: "CSidebarNavItem",
       name: "Approve Users",
       to: "/approve",
-      icon: <CIcon name="cil-check" customClasses="c-sidebar-nav-icon" />
+      icon: <CIcon name="cil-check" customClasses="c-sidebar-nav-icon" />,
     },
     {
       _tag: "CSidebarNavDivider",
-      className: "m-2"
-    }
+      className: "m-2",
+    },
   ];
 }
 
