@@ -14,7 +14,7 @@ import {
   CSpinner
 } from "@coreui/react";
 
-import UserServices from "../../../../services/user.services";
+import UserServices from "../../../../services/admin.services";
 const fields = ["username", "email", "action"];
 
 const ApproveUsers = () => {
@@ -26,6 +26,7 @@ const ApproveUsers = () => {
   const [modalButton, setModalButton] = useState("");
 
   const [token, setToken] = useState("");
+  const [userId, setUserId] = useState("");
 
   const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
@@ -41,10 +42,11 @@ const ApproveUsers = () => {
     });
   };
 
-  const modalHandler = (type, verifiedToken) => {
+  const modalHandler = (type, verifiedToken, id = null) => {
     setModal(!modal);
     setModalType(type);
     setToken(verifiedToken);
+    setUserId(id);
 
     if (type === "danger") {
       setModalMessage("Reject this user?");
@@ -58,16 +60,27 @@ const ApproveUsers = () => {
   const approveRejectHandler = () => {
     setModal(!modal);
     if (modalType === "danger") {
-      console.log("hapus");
+      UserServices.deleteUser(userId)
+        .then(res => {
+          getAlluser();
+          setAlertType("success");
+          setAlertMessage("Delete user successfully");
+        })
+        .catch(err => {
+          setAlertType("danger");
+          setAlertMessage("An error has occured");
+        });
     } else {
       UserServices.approveUser(token)
         .then(res => {
-          console.log(res);
           getAlluser();
           setAlertType("success");
-          setAlertMessage("Approve successfull");
+          setAlertMessage("Approve user successfully");
         })
-        .catch(err => console.log(err));
+        .catch(() => {
+          setAlertType("danger");
+          setAlertMessage("An error has occured");
+        });
     }
   };
 
@@ -123,7 +136,7 @@ const ApproveUsers = () => {
                         color="danger"
                         size="sm"
                         className="mx-1 px-3"
-                        onClick={() => modalHandler("danger")}
+                        onClick={() => modalHandler("danger", null, item.id)}
                       >
                         Reject
                       </CButton>

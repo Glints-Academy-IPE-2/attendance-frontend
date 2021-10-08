@@ -11,11 +11,11 @@ import {
   CModalBody,
   CModalFooter,
   CAlert,
-  CImg,
+  CImg
 } from "@coreui/react";
 
 import { ApproveUsersData } from "../../../data/Attendance";
-import UserServices from "../../../../services/user.services";
+import UserServices from "../../../../services/admin.services";
 
 const userFields = ["username", "action"];
 const absentFields = ["name", "absent", "action"];
@@ -38,7 +38,7 @@ const DashboardAdmin = () => {
   const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
 
-  const modalDetailHandler = (data) => {
+  const modalDetailHandler = data => {
     setModalDetail(!modalDetail);
     setUserDetail(data);
   };
@@ -49,7 +49,7 @@ const DashboardAdmin = () => {
     if (type === "danger") {
       setModalMessage("Delete this user?");
       setModalType("danger");
-      setModalBmodalButtonText("Reset");
+      setModalBmodalButtonText("Delete");
     } else {
       setModalMessage("Reset user location?");
       setModalType("warning");
@@ -61,12 +61,12 @@ const DashboardAdmin = () => {
     setModal(!modal);
     if (modalType === "danger") {
       UserServices.deleteUser(userId)
-        .then((res) => {
+        .then(res => {
           setAlertType("success");
           setAlertMessage("User deleted successfully");
           getAlluser();
         })
-        .catch((err) => {
+        .catch(err => {
           setAlertType("success");
           setAlertMessage("User failed to delete");
         });
@@ -74,10 +74,10 @@ const DashboardAdmin = () => {
   };
 
   const getAlluser = () => {
-    UserServices.getAllUsers().then((res) => {
+    UserServices.getAllUsers().then(res => {
       const users = res.data.data.users.rows;
       const filteredUsers = users.filter(
-        (user) => user.isApproved === true && user.isVerified === true
+        user => user.isApproved === true && user.isVerified === true
       );
       setUsers(filteredUsers);
     });
@@ -98,7 +98,7 @@ const DashboardAdmin = () => {
                 color: "white",
                 fontWeight: "600",
                 borderRadius: "10px 10px 0 0",
-                marginTop: "-10px",
+                marginTop: "-10px"
               }}
             >
               Users
@@ -116,7 +116,7 @@ const DashboardAdmin = () => {
                 itemsPerPage={5}
                 pagination
                 scopedSlots={{
-                  action: (item) => (
+                  action: item => (
                     <td>
                       <CButton
                         shape="pill"
@@ -146,7 +146,7 @@ const DashboardAdmin = () => {
                         Delete
                       </CButton>
                     </td>
-                  ),
+                  )
                 }}
               />
             </CCardBody>
@@ -160,7 +160,7 @@ const DashboardAdmin = () => {
                 color: "white",
                 fontWeight: "600",
                 borderRadius: "10px 10px 0 0",
-                marginTop: "-10px",
+                marginTop: "-10px"
               }}
             >
               Absent more than 2 days this month
@@ -173,7 +173,7 @@ const DashboardAdmin = () => {
                 itemsPerPage={5}
                 pagination
                 scopedSlots={{
-                  action: (item) => (
+                  action: item => (
                     <td>
                       <CButton
                         shape="pill"
@@ -184,7 +184,7 @@ const DashboardAdmin = () => {
                         Detail
                       </CButton>
                     </td>
-                  ),
+                  )
                 }}
               />
             </CCardBody>

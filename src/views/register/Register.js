@@ -118,6 +118,7 @@ const Register = () => {
                         Username
                       </CLabel>
                       <input
+                        name="username"
                         type="text"
                         {...register("username")}
                         className={`form-control ${

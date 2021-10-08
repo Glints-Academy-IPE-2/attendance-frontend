@@ -25,11 +25,11 @@ const getAllAttendance = () => {
   });
 };
 
-const UserServices = {
+const AdminServices = {
   getAllUsers,
   approveUser,
   deleteUser,
   getAllAttendance
 };
 
-export default UserServices;
+export default AdminServices;
