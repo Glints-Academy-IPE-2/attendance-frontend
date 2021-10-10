@@ -9,6 +9,8 @@ import WorkLocation from "../../../../components/user/dashboard/WorkLocation";
 import SetWorkLocation from "../../../../components/user/dashboard/SetWorkLocation";
 import CheckInOut from "../../../../components/user/dashboard/CheckInOut";
 
+import UserServices from "../../../../services/user.services";
+
 const Dashboard = () => {
   // checkin-out
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -17,8 +19,11 @@ const Dashboard = () => {
   // error
   const [error, setError] = useState(null);
 
+  // user
+  const [currentUser, setCurrentUser] = useState(null);
+
   // set location
-  const [isLocationSet, setIsLocationSet] = useState(false);
+  const [isLocationSet, setIsLocationSet] = useState(false)
   const indonesiaLocation = { lat: -2.548926, lng: 118.0148634 };
   const [workLocation, setWorkLocation] = useState(indonesiaLocation);
   const [userLocation, setUserLocation] = useState(null);
@@ -78,6 +83,9 @@ const Dashboard = () => {
     // fix map doesn't display completely
     // it needs to resize the window for loading completely the map
     window.dispatchEvent(new Event("resize"));
+    // get user
+    const user = UserServices.getCurrentUser().user;
+    setCurrentUser(user);
   }, []);
 
   useEffect(() => {

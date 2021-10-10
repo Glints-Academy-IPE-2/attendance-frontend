@@ -8,13 +8,13 @@ const getAllUsers = () => {
 };
 
 const approveUser = verifiedToken => {
-  return axios.get(API_URL + "approve-user" + verifiedToken, {
+  return axios.get(API_URL + "approve-user/" + verifiedToken, {
     headers: authHeader()
   });
 };
 
 const deleteUser = id => {
-  return axios.delete(API_URL + "delete-user" + id, {
+  return axios.delete(API_URL + "delete-user/" + id, {
     headers: authHeader()
   });
 };

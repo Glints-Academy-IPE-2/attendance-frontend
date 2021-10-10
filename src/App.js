@@ -17,8 +17,6 @@ const Login = React.lazy(() => import("./views/login/Login"));
 const Register = React.lazy(() => import("./views/register/Register"));
 const Forgot = React.lazy(() => import("./views/forgot/ForgotPassword"));
 const Reset = React.lazy(() => import("./views/reset/ResetPassword"));
-const Page404 = React.lazy(() => import("./views/page404/Page404"));
-const Page500 = React.lazy(() => import("./views/page500/Page500"));
 
 class App extends Component {
   render() {
@@ -30,37 +28,25 @@ class App extends Component {
               exact
               path="/login"
               name="Login Page"
-              render={(props) => <Login {...props} />}
+              render={props => <Login {...props} />}
             />
             <Route
               exact
               path="/register"
               name="Register Page"
-              render={(props) => <Register {...props} />}
+              render={props => <Register {...props} />}
             />
             <Route
               exact
               path="/forgot"
               name="Forgot Password Page"
-              render={(props) => <Forgot {...props} />}
+              render={props => <Forgot {...props} />}
             />
             <Route
               exact
               path="/resetPassword"
               name="Reset Password Page"
-              render={(props) => <Reset {...props} />}
-            />
-            <Route
-              exact
-              path="/404"
-              name="Page 404"
-              render={(props) => <Page404 {...props} />}
-            />
-            <Route
-              exact
-              path="/500"
-              name="Page 500"
-              render={(props) => <Page500 {...props} />}
+              render={props => <Reset {...props} />}
             />
             <PrivateRoute path="/" name="Home" component={TheLayout} />
           </Switch>

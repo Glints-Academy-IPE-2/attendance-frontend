@@ -67,6 +67,7 @@ const ApproveUsers = () => {
           setAlertMessage("Delete user successfully");
         })
         .catch(err => {
+          console.log(err.response.data);
           setAlertType("danger");
           setAlertMessage("An error has occured");
         });

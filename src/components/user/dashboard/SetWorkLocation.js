@@ -1,4 +1,10 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useEffect
+} from "react";
 
 // coreui
 import {
@@ -13,6 +19,9 @@ import {
 // font awesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+
+// api
+import UserServices from "../../../services/user.services";
 
 // map
 import {
@@ -99,6 +108,20 @@ const SetWorkLocation = ({
   indonesiaLocation
 }) => {
   const [modalLocation, setModalLocation] = useState(!isLocationSet);
+  const [userId, setUserId] = useState(null);
+
+  const modalButtonHandler = () => {
+    setModalLocation(!modalLocation);
+    setIsLocationSet(!isLocationSet);
+    UserServices.setLocation(userId, workLocation.lat, workLocation.lng)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+  };
+
+  useEffect(() => {
+    const user = UserServices.getCurrentUser().user;
+    setUserId(user.id);
+  }, []);
 
   return (
     <>
@@ -138,13 +161,7 @@ const SetWorkLocation = ({
           </MapContainer>
         </CModalBody>
         <CModalFooter>
-          <CButton
-            color="dark"
-            onClick={() => {
-              setModalLocation(!modalLocation);
-              setIsLocationSet(!isLocationSet);
-            }}
-          >
+          <CButton color="dark" onClick={modalButtonHandler}>
             Set Location
           </CButton>
         </CModalFooter>
