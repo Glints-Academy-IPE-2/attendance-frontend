@@ -51,7 +51,7 @@ const DashboardAdmin = () => {
       setModalType("danger");
       setModalBmodalButtonText("Delete");
     } else {
-      setModalMessage("Reset user location?");
+      setModalMessage("Reset user location? *coming soon :)");
       setModalType("warning");
       setModalBmodalButtonText("Reset");
     }

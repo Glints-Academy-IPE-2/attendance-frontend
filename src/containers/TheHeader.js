@@ -6,9 +6,9 @@ import {
   CHeaderBrand,
   CHeaderNav,
   CHeaderNavItem,
-  CHeaderNavLink
+  CHeaderNavLink,
+  CImg
 } from "@coreui/react";
-import CIcon from "@coreui/icons-react";
 
 import { TheHeaderDropdown } from "./index";
 
@@ -43,7 +43,11 @@ const TheHeader = () => {
         onClick={toggleSidebar}
       />
       <CHeaderBrand className="mx-auto d-lg-none" to="/">
-        <CIcon name="logo" height="48" alt="Logo" />
+        <CImg
+          src={"img/absensi1.png"}
+          style={{ width: "70%", height: "auto" }}
+          className="my-2"
+        />
       </CHeaderBrand>
 
       <CHeaderNav className="d-md-down-none mr-auto">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   CCard,
   CCardBody,
@@ -8,11 +8,53 @@ import {
   CRow
 } from "@coreui/react";
 
-import { UserAttendanceData } from "../../../data/Attendance";
+import UserServices from "../../../../services/user.services";
 
-const fields = ["date", "checkIn", "checkOut", "workingHour"];
+const fields = ["date", "checkin", "checkout", "workingHour"];
 
 const Attendance = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userId = UserServices.getCurrentUser().user.id;
+    UserServices.getAttendance(userId)
+      .then(res => {
+        const timeFormat = time => {
+          return time == null ? "--:--" : time.slice(11, 16);
+        };
+
+        const dateFormat = (checkin, checkout) => {
+          return checkin ? checkin : checkout;
+        };
+
+        const attendances = res.data.data.user.attendance.map(attendance => {
+          return {
+            ...attendance,
+            checkin: timeFormat(attendance.checkin),
+            checkout: timeFormat(attendance.checkout),
+            date: dateFormat(attendance.checkin, attendance.checkout)
+          };
+        });
+
+        attendances.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        const usertAttendance = attendances.map(d => {
+          return {
+            ...d,
+            date: d.date
+              .slice(0, 10)
+              .split("-")
+              .reverse()
+              .join("-")
+          };
+        });
+
+        setUser(usertAttendance);
+      })
+      .catch(err => console.log(err));
+  }, []);
+
   return (
     <>
       <CRow>
@@ -31,7 +73,7 @@ const Attendance = () => {
             </CCardHeader>
             <CCardBody>
               <CDataTable
-                items={UserAttendanceData}
+                items={user}
                 fields={fields}
                 bordered
                 itemsPerPage={10}

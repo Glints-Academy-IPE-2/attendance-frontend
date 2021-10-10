@@ -6,17 +6,31 @@ import {
   CCol,
   CDataTable,
   CRow,
-  CAlert
+  CAlert,
+  CBadge
 } from "@coreui/react";
 
 import UserServices from "../../../../services/admin.services";
 
-const fields = ["username", "checkin", "checkout", "date"];
+const fields = ["username", "checkin", "checkout", "workDuration", "date"];
+
+const getBadge = duration => {
+  if (duration >= 8) {
+    return "success";
+  } else if (duration < 8 && duration >= 6) {
+    return "warning";
+  } else if (duration < 6) {
+    return "danger";
+  } else {
+    return "";
+  }
+};
 
 const UsersAttendance = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(false);
 
+  // pls dont ask anything :')
   useEffect(() => {
     UserServices.getAllAttendance()
       .then(res => {
@@ -39,30 +53,67 @@ const UsersAttendance = () => {
               attendance.checkin !== null || attendance.checkout !== null
           );
         const data = arrAttendances.map(attendance => {
-          const timeFormat = time => {
-            return time == null ? null : time.slice(11, 16);
-          };
-
           const dateFormat = (checkin, checkout) => {
-            // return checkin ? checkin.slice(0, 10) : checkout.slice(0, 10);
             return checkin ? checkin : checkout;
           };
 
           return {
             ...attendance,
-            checkin: timeFormat(attendance.checkin),
-            checkout: timeFormat(attendance.checkout),
             date: dateFormat(attendance.checkin, attendance.checkout),
             username: usersUsername.find(user => attendance.UserId === user.id)
               .username
           };
         });
-        data.sort(
+        const mergeData = data
+          .map((attendance, id) => {
+            const checkoutValue = val => {
+              if (val) {
+                return val;
+              } else {
+                const checkout = data.find(
+                  (d, index) =>
+                    d.username === attendance.username &&
+                    d.date.slice(0, 10) === attendance.date.slice(0, 10) &&
+                    d.checkout !== null &&
+                    index !== id
+                );
+                return checkout ? checkout.checkout : "--:--";
+              }
+            };
+
+            return {
+              ...attendance,
+              checkout: checkoutValue(attendance.checkout)
+            };
+          })
+          .filter(data => data.checkin)
+          .map(data => {
+            const workDurationHandler = ({ checkout, checkin }) => {
+              if (checkout === "--:--") {
+                return "-";
+              }
+              return Math.floor(
+                (new Date(checkout) - new Date(checkin)) / 3600000
+              );
+            };
+
+            return {
+              ...data,
+              workDuration: workDurationHandler(data)
+            };
+          });
+        mergeData.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );
-        const usertAttendance = data.map(d => {
+        const usertAttendance = mergeData.map(d => {
+          const timeFormat = time => {
+            return time == "--:--" ? "--:--" : time.slice(11, 16);
+          };
+
           return {
             ...d,
+            checkin: timeFormat(d.checkin),
+            checkout: timeFormat(d.checkout),
             date: d.date
               .slice(0, 10)
               .split("-")
@@ -103,6 +154,17 @@ const UsersAttendance = () => {
                 bordered
                 itemsPerPage={10}
                 pagination
+                scopedSlots={{
+                  workDuration: item => (
+                    <td>
+                      <CBadge color={getBadge(item.workDuration)}>
+                        {item.workDuration > 1
+                          ? `${item.workDuration} hours`
+                          : `${item.workDuration} hour`}
+                      </CBadge>
+                    </td>
+                  )
+                }}
               />
             </CCardBody>
           </CCard>

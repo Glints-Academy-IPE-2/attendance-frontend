@@ -10,7 +10,7 @@ import {
   CSidebarMinimizer,
   CSidebarNavDropdown,
   CSidebarNavItem,
-  CImg,
+  CImg
 } from "@coreui/react";
 
 // sidebar nav config
@@ -18,27 +18,17 @@ import navigation from "./_nav";
 
 const TheSidebar = () => {
   const dispatch = useDispatch();
-  const show = useSelector((state) => state.sidebarShow);
+  const show = useSelector(state => state.sidebarShow);
 
   return (
     <CSidebar
       show={show}
-      onShowChange={(val) => dispatch({ type: "set", sidebarShow: val })}
+      onShowChange={val => dispatch({ type: "set", sidebarShow: val })}
     >
       <CSidebarBrand className="d-md-down-none" to="/">
-        {/* <CIcon
-          className="c-sidebar-brand-full"
-          name="logo-negative"
-          height={35}
-        /> */}
-        {/* <CIcon
-          className="c-sidebar-brand-minimized"
-          name="sygnet"
-          height={35}
-        /> */}
         <CImg
-          src={"img/absensi.png"}
-          style={{ width: "30%", height: "auto" }}
+          src={"img/absensi1.png"}
+          style={{ width: "70%", height: "auto" }}
         />
       </CSidebarBrand>
       <CSidebarNav>
@@ -48,7 +38,7 @@ const TheSidebar = () => {
             CSidebarNavDivider,
             CSidebarNavDropdown,
             CSidebarNavItem,
-            CSidebarNavTitle,
+            CSidebarNavTitle
           }}
         />
       </CSidebarNav>
