@@ -7,12 +7,15 @@ import {
   CRow,
   CModal,
   CModalBody,
-  CModalFooter
+  CModalFooter,
+  CAlert
 } from "@coreui/react";
 
 // font awesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import UserServices from "src/services/user.services";
+import AuthServices from "src/services/auth.service";
 
 const CheckInOut = ({
   isCheckedIn,
@@ -22,9 +25,14 @@ const CheckInOut = ({
 }) => {
   const [modal, setModal] = useState(false);
   const [modalAttribute, setModalAttribute] = useState({});
+  const [type, setType] = useState("");
+  const [isResponse, setIsResponse] = useState(false);
+  const [resType, setResType] = useState("");
+  const [resMessage, setResMessage] = useState("");
 
   const buttonHandler = (color, message, colorMessage, button) => {
     setModal(!modal);
+    setType(color);
     setModalAttribute({
       color,
       message,
@@ -35,11 +43,48 @@ const CheckInOut = ({
 
   const modalButtonHandler = () => {
     setModal(!modal);
+    const userId = AuthServices.getCurrentUser().user.id;
+    if (type === "primary") {
+      UserServices.checkin(userId)
+        .then(res => {
+          setIsResponse(true);
+          setResType("success");
+          setResMessage("Checkin success");
+        })
+        .catch(err => {
+          setIsResponse(true);
+          setResType("danger");
+          setResMessage("An error has occured");
+        });
+    } else {
+      UserServices.checkout(userId)
+        .then(res => {
+          setIsResponse(true);
+          setResType("success");
+          setResMessage("Checkout success");
+        })
+        .catch(err => {
+          setIsResponse(true);
+          setResType("danger");
+          setResMessage("An error has occured");
+        });
+    }
     checkInOutHandler();
   };
 
   return (
     <>
+      {isResponse && (
+        <CAlert
+          color={resType}
+          onClick={() => {
+            setIsResponse(false);
+          }}
+          closeButton
+        >
+          {resMessage}
+        </CAlert>
+      )}
       <CRow className="justify-content-center mt-2">
         <CCol md="4" className="mt-2">
           <CButton

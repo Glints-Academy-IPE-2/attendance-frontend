@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 
 // coreui
-import { CCard, CCardBody, CCol, CRow } from "@coreui/react";
+import { CCard, CCardBody, CCol, CRow, CAlert } from "@coreui/react";
 
 // components
 import DateTime from "../../../../components/user/dashboard/DateTime";
-import WorkLocation from "../../../../components/user/dashboard/WorkLocation";
 import SetWorkLocation from "../../../../components/user/dashboard/SetWorkLocation";
+import WorkLocation from "../../../../components/user/dashboard/WorkLocation";
 import CheckInOut from "../../../../components/user/dashboard/CheckInOut";
-
-import UserServices from "../../../../services/user.services";
+import AuthServices from "src/services/auth.service";
+import UserServices from "src/services/user.services";
 
 const Dashboard = () => {
   // checkin-out
@@ -19,11 +19,8 @@ const Dashboard = () => {
   // error
   const [error, setError] = useState(null);
 
-  // user
-  const [currentUser, setCurrentUser] = useState(null);
-
   // set location
-  const [isLocationSet, setIsLocationSet] = useState(false)
+  const [isLocationSet, setIsLocationSet] = useState(false);
   const indonesiaLocation = { lat: -2.548926, lng: 118.0148634 };
   const [workLocation, setWorkLocation] = useState(indonesiaLocation);
   const [userLocation, setUserLocation] = useState(null);
@@ -49,9 +46,11 @@ const Dashboard = () => {
           `Your distance from the office is ${distance -
             100}m from what is allowed`
         );
+        return false;
       } else {
-        setIsCheckedIn(!isCheckedIn);
+        // setIsCheckedIn(!isCheckedIn);
         setIsCheckedOut(!isCheckedOut);
+        return true;
       }
     });
   };
@@ -83,34 +82,78 @@ const Dashboard = () => {
     // fix map doesn't display completely
     // it needs to resize the window for loading completely the map
     window.dispatchEvent(new Event("resize"));
-    // get user
-    const user = UserServices.getCurrentUser().user;
-    setCurrentUser(user);
+  }, []);
+
+  const buttonDisabledHandler = () => {
+    const userId = AuthServices.getCurrentUser().user.id;
+    UserServices.getAttendance(userId)
+      .then(res => {
+        const attendances = res.data.data.user.attendance;
+        const checkin = attendances.filter(
+          attendance =>
+            (attendance.checkin || "").slice(0, 10) ===
+            new Date().toISOString().slice(0, 10)
+        );
+        if (checkin.length) {
+          setIsCheckedIn(true);
+        }
+        const checkout = attendances.filter(
+          attendance =>
+            (attendance.checkout || "").slice(0, 10) ===
+            new Date().toISOString().slice(0, 10)
+        );
+        if (checkout.length) {
+          setIsCheckedOut(true);
+        } else {
+          setIsCheckedOut(false);
+        }
+      })
+      .catch(err => {
+        setError("An error has occured");
+      });
+  };
+
+  // checkin checkout
+  useEffect(() => {
+    buttonDisabledHandler();
   }, []);
 
   useEffect(() => {
-    getUserLocation()
-      .then(res => {
-        const { coords: { latitude: lat, longitude: lng } = {} } = res;
+    const { latitude, longitude } = AuthServices.getCurrentUser().user;
+    if (latitude !== 0 && longitude !== 0) {
+      setIsLocationSet(true);
+      setWorkLocation({ lat: latitude, lng: longitude });
+    }
+  }, []);
 
-        setWorkLocation({ lat, lng });
-        if (map) {
-          map.flyTo([lat, lng], 16);
-        }
-      })
-      .catch();
+  useEffect(() => {
+    const { latitude, longitude } = AuthServices.getCurrentUser().user;
+    if (latitude === 0 && longitude === 0) {
+      getUserLocation()
+        .then(res => {
+          const { coords: { latitude: lat, longitude: lng } = {} } = res;
+
+          setWorkLocation({ lat, lng });
+          if (map) {
+            map.flyTo([lat, lng], 16);
+          }
+        })
+        .catch();
+    }
   }, [map]);
 
   return (
     <>
-      <SetWorkLocation
-        isLocationSet={isLocationSet}
-        setIsLocationSet={setIsLocationSet}
-        workLocation={workLocation}
-        setWorkLocation={setWorkLocation}
-        setMap={setMap}
-        indonesiaLocation={indonesiaLocation}
-      />
+      {!isLocationSet && (
+        <SetWorkLocation
+          isLocationSet={isLocationSet}
+          setIsLocationSet={setIsLocationSet}
+          workLocation={workLocation}
+          setWorkLocation={setWorkLocation}
+          setMap={setMap}
+          indonesiaLocation={indonesiaLocation}
+        />
+      )}
 
       <CRow>
         <CCol xs="12" sm="12" md="8">
@@ -123,12 +166,26 @@ const Dashboard = () => {
           >
             <CCardBody className="text-center">
               <DateTime />
-              <p className="mt-2 text-danger">{error}</p>
+              {/* <p className="mt-2 text-danger">{error}</p> */}
+              {error && (
+                <CAlert
+                  className="mt-2"
+                  color="danger"
+                  onClick={() => {
+                    setError("");
+                  }}
+                  closeButton
+                >
+                  {error}
+                </CAlert>
+              )}
               <CheckInOut
                 isCheckedIn={isCheckedIn}
                 isLocationSet={isLocationSet}
                 isCheckedOut={isCheckedOut}
                 checkInOutHandler={checkInOutHandler}
+                setIsCheckedIn={setIsCheckedIn}
+                setIsCheckedOut={setIsCheckedOut}
               />
             </CCardBody>
           </CCard>

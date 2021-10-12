@@ -11,7 +11,8 @@ import {
   CModalBody,
   CModalFooter,
   CAlert,
-  CImg
+  CImg,
+  CSpinner
 } from "@coreui/react";
 
 import { ApproveUsersData } from "../../../data/Attendance";
@@ -37,6 +38,8 @@ const DashboardAdmin = () => {
 
   const [alertType, setAlertType] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const modalDetailHandler = data => {
     setModalDetail(!modalDetail);
@@ -79,6 +82,7 @@ const DashboardAdmin = () => {
       const filteredUsers = users.filter(
         user => user.isApproved === true && user.isVerified === true
       );
+      setIsLoading(false);
       setUsers(filteredUsers);
     });
   };
@@ -89,108 +93,112 @@ const DashboardAdmin = () => {
 
   return (
     <>
-      <CRow>
-        <CCol xl={6}>
-          <CCard>
-            <CCardHeader
-              style={{
-                backgroundColor: "#6C63FF",
-                color: "white",
-                fontWeight: "600",
-                borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
-              }}
-            >
-              Users
-            </CCardHeader>
-            <CCardBody>
-              {alertType && (
-                <CAlert color={alertType} closeButton>
-                  {alertMessage}
-                </CAlert>
-              )}
-              <CDataTable
-                items={users}
-                fields={userFields}
-                bordered
-                itemsPerPage={5}
-                pagination
-                scopedSlots={{
-                  action: item => (
-                    <td>
-                      <CButton
-                        shape="pill"
-                        color="info"
-                        size="sm"
-                        className="mx-1 px-3"
-                        onClick={() => modalDetailHandler(item)}
-                      >
-                        Detail
-                      </CButton>
-                      <CButton
-                        shape="pill"
-                        color="warning"
-                        size="sm"
-                        className="mx-1 px-3"
-                        onClick={() => userButtonHandler("warning", item)}
-                      >
-                        Reset Location
-                      </CButton>
-                      <CButton
-                        shape="pill"
-                        color="danger"
-                        size="sm"
-                        className="mx-1 px-3"
-                        onClick={() => userButtonHandler("danger", item)}
-                      >
-                        Delete
-                      </CButton>
-                    </td>
-                  )
+      {isLoading ? (
+        <CSpinner color="info" />
+      ) : (
+        <CRow>
+          <CCol xl={6}>
+            <CCard>
+              <CCardHeader
+                style={{
+                  backgroundColor: "#6C63FF",
+                  color: "white",
+                  fontWeight: "600",
+                  borderRadius: "10px 10px 0 0",
+                  marginTop: "-10px"
                 }}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
-        <CCol xl={6}>
-          <CCard>
-            <CCardHeader
-              style={{
-                backgroundColor: "#6C63FF",
-                color: "white",
-                fontWeight: "600",
-                borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
-              }}
-            >
-              Absent more than 2 days this month
-            </CCardHeader>
-            <CCardBody>
-              <CDataTable
-                items={ApproveUsersData}
-                fields={absentFields}
-                bordered
-                itemsPerPage={5}
-                pagination
-                scopedSlots={{
-                  action: item => (
-                    <td>
-                      <CButton
-                        shape="pill"
-                        color="info"
-                        size="sm"
-                        className="mx-1 px-3"
-                      >
-                        Detail
-                      </CButton>
-                    </td>
-                  )
+              >
+                Users
+              </CCardHeader>
+              <CCardBody>
+                {alertType && (
+                  <CAlert color={alertType} closeButton>
+                    {alertMessage}
+                  </CAlert>
+                )}
+                <CDataTable
+                  items={users}
+                  fields={userFields}
+                  bordered
+                  itemsPerPage={5}
+                  pagination
+                  scopedSlots={{
+                    action: item => (
+                      <td>
+                        <CButton
+                          shape="pill"
+                          color="info"
+                          size="sm"
+                          className="mx-1 px-3"
+                          onClick={() => modalDetailHandler(item)}
+                        >
+                          Detail
+                        </CButton>
+                        <CButton
+                          shape="pill"
+                          color="warning"
+                          size="sm"
+                          className="mx-1 px-3"
+                          onClick={() => userButtonHandler("warning", item)}
+                        >
+                          Reset Location
+                        </CButton>
+                        <CButton
+                          shape="pill"
+                          color="danger"
+                          size="sm"
+                          className="mx-1 px-3"
+                          onClick={() => userButtonHandler("danger", item)}
+                        >
+                          Delete
+                        </CButton>
+                      </td>
+                    )
+                  }}
+                />
+              </CCardBody>
+            </CCard>
+          </CCol>
+          <CCol xl={6}>
+            <CCard>
+              <CCardHeader
+                style={{
+                  backgroundColor: "#6C63FF",
+                  color: "white",
+                  fontWeight: "600",
+                  borderRadius: "10px 10px 0 0",
+                  marginTop: "-10px"
                 }}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+              >
+                Absent more than 2 days this month
+              </CCardHeader>
+              <CCardBody>
+                <CDataTable
+                  items={ApproveUsersData}
+                  fields={absentFields}
+                  bordered
+                  itemsPerPage={5}
+                  pagination
+                  scopedSlots={{
+                    action: item => (
+                      <td>
+                        <CButton
+                          shape="pill"
+                          color="info"
+                          size="sm"
+                          className="mx-1 px-3"
+                        >
+                          Detail
+                        </CButton>
+                      </td>
+                    )
+                  }}
+                />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      )}
 
       {/* Modal Reset and Delete */}
       <CModal

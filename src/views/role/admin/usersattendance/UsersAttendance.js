@@ -7,7 +7,8 @@ import {
   CDataTable,
   CRow,
   CAlert,
-  CBadge
+  CBadge,
+  CSpinner
 } from "@coreui/react";
 
 import UserServices from "../../../../services/admin.services";
@@ -29,6 +30,7 @@ const getBadge = duration => {
 const UsersAttendance = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // pls dont ask anything :')
   useEffect(() => {
@@ -107,7 +109,7 @@ const UsersAttendance = () => {
         );
         const usertAttendance = mergeData.map(d => {
           const timeFormat = time => {
-            return time == "--:--" ? "--:--" : time.slice(11, 16);
+            return time === "--:--" ? "--:--" : new Date(time).toTimeString().slice(0, 5);
           };
 
           return {
@@ -121,55 +123,63 @@ const UsersAttendance = () => {
               .join("-")
           };
         });
+        setIsLoading(false);
         setUser(usertAttendance);
       })
-      .catch(err => setError(err));
+      .catch(err => {
+        setIsLoading(false);
+        setError(err);
+      });
   }, []);
 
   return (
     <>
-      <CRow>
-        <CCol>
-          <CCard>
-            <CCardHeader
-              style={{
-                backgroundColor: "#6C63FF",
-                color: "white",
-                fontWeight: "600",
-                borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
-              }}
-            >
-              Users Attendance
-            </CCardHeader>
-            {error && (
-              <CAlert color="danger" closeButton>
-                {error}
-              </CAlert>
-            )}
-            <CCardBody>
-              <CDataTable
-                items={user}
-                fields={fields}
-                bordered
-                itemsPerPage={10}
-                pagination
-                scopedSlots={{
-                  workDuration: item => (
-                    <td>
-                      <CBadge color={getBadge(item.workDuration)}>
-                        {item.workDuration > 1
-                          ? `${item.workDuration} hours`
-                          : `${item.workDuration} hour`}
-                      </CBadge>
-                    </td>
-                  )
+      {isLoading ? (
+        <CSpinner color="info" />
+      ) : (
+        <CRow>
+          <CCol>
+            <CCard>
+              <CCardHeader
+                style={{
+                  backgroundColor: "#6C63FF",
+                  color: "white",
+                  fontWeight: "600",
+                  borderRadius: "10px 10px 0 0",
+                  marginTop: "-10px"
                 }}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+              >
+                Users Attendance
+              </CCardHeader>
+              {error && (
+                <CAlert color="danger" closeButton>
+                  {error}
+                </CAlert>
+              )}
+              <CCardBody>
+                <CDataTable
+                  items={user}
+                  fields={fields}
+                  bordered
+                  itemsPerPage={10}
+                  pagination
+                  scopedSlots={{
+                    workDuration: item => (
+                      <td>
+                        <CBadge color={getBadge(item.workDuration)}>
+                          {item.workDuration > 1
+                            ? `${item.workDuration} hours`
+                            : `${item.workDuration} hour`}
+                        </CBadge>
+                      </td>
+                    )
+                  }}
+                />
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      )}
     </>
   );
 };

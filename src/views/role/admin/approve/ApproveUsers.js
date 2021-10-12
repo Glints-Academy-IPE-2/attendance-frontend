@@ -34,10 +34,10 @@ const ApproveUsers = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const getAlluser = () => {
-    setIsLoading(false);
     UserServices.getAllUsers().then(res => {
       const users = res.data.data.users.rows;
       const filteredUsers = users.filter(user => user.isApproved === false);
+      setIsLoading(false);
       setNotApprovedUsers(filteredUsers);
     });
   };
@@ -67,7 +67,6 @@ const ApproveUsers = () => {
           setAlertMessage("Delete user successfully");
         })
         .catch(err => {
-          console.log(err.response.data);
           setAlertType("danger");
           setAlertMessage("An error has occured");
         });
@@ -93,60 +92,63 @@ const ApproveUsers = () => {
     <>
       <CRow>
         <CCol>
-          {isLoading && <CSpinner color="info" />}
-          <CCard>
-            <CCardHeader
-              style={{
-                backgroundColor: "#6C63FF",
-                color: "white",
-                fontWeight: "600",
-                borderRadius: "10px 10px 0 0",
-                marginTop: "-10px"
-              }}
-            >
-              Approve Users
-            </CCardHeader>
-            <CCardBody>
-              {alertType && (
-                <CAlert color={alertType} closeButton>
-                  {alertMessage}
-                </CAlert>
-              )}
-              <CDataTable
-                items={notApprovedUsers}
-                fields={fields}
-                bordered
-                itemsPerPage={5}
-                pagination
-                scopedSlots={{
-                  action: item => (
-                    <td>
-                      <CButton
-                        shape="pill"
-                        color="success"
-                        size="sm"
-                        className="mx-1 px-3"
-                        onClick={() =>
-                          modalHandler("success", item.verifiedToken)
-                        }
-                      >
-                        Approve
-                      </CButton>
-                      <CButton
-                        shape="pill"
-                        color="danger"
-                        size="sm"
-                        className="mx-1 px-3"
-                        onClick={() => modalHandler("danger", null, item.id)}
-                      >
-                        Reject
-                      </CButton>
-                    </td>
-                  )
+          {isLoading ? (
+            <CSpinner color="info" />
+          ) : (
+            <CCard>
+              <CCardHeader
+                style={{
+                  backgroundColor: "#6C63FF",
+                  color: "white",
+                  fontWeight: "600",
+                  borderRadius: "10px 10px 0 0",
+                  marginTop: "-10px"
                 }}
-              />
-            </CCardBody>
-          </CCard>
+              >
+                Approve Users
+              </CCardHeader>
+              <CCardBody>
+                {alertType && (
+                  <CAlert color={alertType} closeButton>
+                    {alertMessage}
+                  </CAlert>
+                )}
+                <CDataTable
+                  items={notApprovedUsers}
+                  fields={fields}
+                  bordered
+                  itemsPerPage={5}
+                  pagination
+                  scopedSlots={{
+                    action: item => (
+                      <td>
+                        <CButton
+                          shape="pill"
+                          color="success"
+                          size="sm"
+                          className="mx-1 px-3"
+                          onClick={() =>
+                            modalHandler("success", item.verifiedToken)
+                          }
+                        >
+                          Approve
+                        </CButton>
+                        <CButton
+                          shape="pill"
+                          color="danger"
+                          size="sm"
+                          className="mx-1 px-3"
+                          onClick={() => modalHandler("danger", null, item.id)}
+                        >
+                          Reject
+                        </CButton>
+                      </td>
+                    )
+                  }}
+                />
+              </CCardBody>
+            </CCard>
+          )}
         </CCol>
       </CRow>
 

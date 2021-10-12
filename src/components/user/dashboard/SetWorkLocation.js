@@ -22,6 +22,7 @@ import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 // api
 import UserServices from "../../../services/user.services";
+import AuthServices from "../../../services/auth.service";
 
 // map
 import {
@@ -114,13 +115,28 @@ const SetWorkLocation = ({
     setModalLocation(!modalLocation);
     setIsLocationSet(!isLocationSet);
     UserServices.setLocation(userId, workLocation.lat, workLocation.lng)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+      .then(res => {
+        // update workLocation in local storage
+        const user = AuthServices.getCurrentUser();
+        const updatedData = {
+          token: user.token,
+          user: {
+            ...user.user,
+            latitude: workLocation.lat,
+            longitude: workLocation.lng
+          }
+        };
+        localStorage.setItem("user", JSON.stringify(updatedData));
+      })
+      .catch();
   };
 
   useEffect(() => {
     const user = UserServices.getCurrentUser().user;
     setUserId(user.id);
+    if (user.latitude !== 0 && user.longitude !== 0) {
+      setModalLocation(false);
+    }
   }, []);
 
   return (

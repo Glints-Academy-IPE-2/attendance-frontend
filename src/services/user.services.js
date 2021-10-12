@@ -36,10 +36,36 @@ const setLocation = (id, latitude, longitude) => {
   );
 };
 
+const checkin = id => {
+  return axios.post(
+    API_URL + `checkin/${id}`,
+    {
+      checkin: new Date().toISOString()
+    },
+    {
+      headers: authHeader()
+    }
+  );
+};
+
+const checkout = id => {
+  return axios.post(
+    API_URL + `checkout/${id}`,
+    {
+      checkout: new Date().toISOString()
+    },
+    {
+      headers: authHeader()
+    }
+  );
+};
+
 const UserServices = {
   getCurrentUser,
   setLocation,
-  getAttendance
+  getAttendance,
+  checkin,
+  checkout
 };
 
 export default UserServices;
