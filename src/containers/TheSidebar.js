@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   CCreateElement,
@@ -10,20 +10,27 @@ import {
   CSidebarMinimizer,
   CSidebarNavDropdown,
   CSidebarNavItem,
-  CImg
+  CImg,
 } from "@coreui/react";
 
+import AuthServices from "../services/auth.service";
 // sidebar nav config
 import navigation from "./_nav";
 
 const TheSidebar = () => {
   const dispatch = useDispatch();
-  const show = useSelector(state => state.sidebarShow);
+  const show = useSelector((state) => state.sidebarShow);
+  const [nav, setNav] = useState([])
+
+  useEffect(() => {
+    const arr = navigation(AuthServices.getCurrentUser().user.isAdmin);
+    setNav(arr);
+  }, []);
 
   return (
     <CSidebar
       show={show}
-      onShowChange={val => dispatch({ type: "set", sidebarShow: val })}
+      onShowChange={(val) => dispatch({ type: "set", sidebarShow: val })}
     >
       <CSidebarBrand className="d-md-down-none" to="/">
         <CImg
@@ -33,12 +40,12 @@ const TheSidebar = () => {
       </CSidebarBrand>
       <CSidebarNav>
         <CCreateElement
-          items={navigation}
+          items={nav}
           components={{
             CSidebarNavDivider,
             CSidebarNavDropdown,
             CSidebarNavItem,
-            CSidebarNavTitle
+            CSidebarNavTitle,
           }}
         />
       </CSidebarNav>

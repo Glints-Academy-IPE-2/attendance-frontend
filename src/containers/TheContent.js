@@ -1,9 +1,10 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { CContainer, CFade } from "@coreui/react";
 
 // routes config
 import routes from "../routes";
+import AuthServices from "../services/auth.service";
 
 const loading = (
   <div className="pt-3 text-center">
@@ -12,12 +13,14 @@ const loading = (
 );
 
 const TheContent = () => {
+  const [isAdmin, setIsAdmin] = useState(AuthServices.getCurrentUser().user.isAdmin);
+
   return (
     <main className="c-main">
       <CContainer fluid>
         <Suspense fallback={loading}>
           <Switch>
-            {routes.map((route, idx) => {
+            {routes(isAdmin).map((route, idx) => {
               return (
                 route.component && (
                   <Route
